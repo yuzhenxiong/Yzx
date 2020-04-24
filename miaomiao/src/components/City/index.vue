@@ -1,92 +1,89 @@
 <template>
 <div class="city_body">
-				<div class="city_list">
-					<div class="city_hot">
-						<h2>热门城市</h2>
-						<ul class="clearfix">
-							<li>上海</li>
-							<li>北京</li>
-							<li>上海</li>
-							<li>北京</li>
-							<li>上海</li>
-							<li>北京</li>
-							<li>上海</li>
-							<li>北京</li>
-						</ul>
-					</div>
-					<div class="city_sort">
-						<div>
-							<h2>A</h2>
-							<ul>
-								<li>阿拉善盟</li>
-								<li>鞍山</li>
-								<li>安庆</li>
-								<li>安阳</li>
-							</ul>
-						</div>
-						<div>
-							<h2>B</h2>
-							<ul>
-								<li>北京</li>
-								<li>保定</li>
-								<li>蚌埠</li>
-								<li>包头</li>
-							</ul>
-						</div>
-						<div>
-							<h2>A</h2>
-							<ul>
-								<li>阿拉善盟</li>
-								<li>鞍山</li>
-								<li>安庆</li>
-								<li>安阳</li>
-							</ul>
-						</div>
-						<div>
-							<h2>B</h2>
-							<ul>
-								<li>北京</li>
-								<li>保定</li>
-								<li>蚌埠</li>
-								<li>包头</li>
-							</ul>
-						</div>
-						<div>
-							<h2>A</h2>
-							<ul>
-								<li>阿拉善盟</li>
-								<li>鞍山</li>
-								<li>安庆</li>
-								<li>安阳</li>
-							</ul>
-						</div>
-						<div>
-							<h2>B</h2>
-							<ul>
-								<li>北京</li>
-								<li>保定</li>
-								<li>蚌埠</li>
-								<li>包头</li>
-							</ul>
-						</div>	
-					</div>
-				</div>
-				<div class="city_index">
-					<ul>
-						<li>A</li>
-						<li>B</li>
-						<li>C</li>
-						<li>D</li>
-						<li>E</li>
-					</ul>
-				</div>
+				
+				<mt-index-list>
+					 <div class="city_hot">
+                        <h2>热门城市</h2>
+                        <ul class="clearfix">
+                            <li v-for="item in hotList" :key="item.id" >{{ item.nm }}</li>
+                        </ul>
+                    </div>
+			<mt-index-section v-for="item in cityList" :key="item.index" :index="item.index">
+				<mt-cell v-for="itemList in item.list" :key="itemList.id" :title="itemList.nm"></mt-cell>
+			</mt-index-section>
+			</mt-index-list>
 			</div>
 		
 </template>
 
 <script>
 export default {
+name:"City",
+data(){
+	return{
+		cityList:[],
+		hotList:[]
+	}
+},
+mounted(){
+	this.axios.get('/api/cityList').then((res)=>{
+	var msg = res.data.msg;
+	if(msg==='ok'){
+		var data = res.data.data.cities
+		var {cityList,hotList} = this.formatCityList(data)
+		this.cityList = cityList;
+		this.hotList = hotList;
+		console.log(cityList,hotList)
+	}
+	})
 
+},
+methods:{
+	formatCityList(cityes){
+		var cityList=[];
+		var hotList=[];
+		for(let i=0;i<cityes.length;i++){
+			if(cityes[i].isHot==1){
+				hotList.push(cityes[i])
+			}
+		}//将热门城市放入热门城市数组
+		for(var i =0;i<cityes.length;i++){//通过for循环来将城市通过首字母分类
+			var firstLetter = cityes[i].py.substring(0,1).toUpperCase();
+			if(toCom(firstLetter)){
+				cityList.push({ index : firstLetter , list : [ { nm : cityes[i].nm , id : cityes[i].id } ] })//如果没有数组中没有此字母，则新建一个包含此字母的对象
+			}else{
+				for (var j = 0; j < cityList.length; j++) {//如果数组中已经存在此首字母，则将其push进入list数组中
+					if(cityList[j].index==firstLetter){
+						cityList[j].list.push({nm:cityes[i].nm,id:cityes[i].id})
+					}
+				}
+			}
+		}
+		function toCom(firstLetter){//通过方法来确定是否要在cityList中插入一个新的对象
+			for(var i =0;i<cityList.length;i++){
+				if(cityList[i].index==firstLetter){
+					return false;
+				}
+			}
+			return true;
+		}
+		 cityList.sort((n1,n2)=>{//将数组从小到大，从A-Z排序
+                if( n1.index > n2.index ){
+                    return 1;
+                }
+                else if(n1.index < n2.index){
+                    return -1;
+                }
+                else{
+                    return 0;
+                }
+            });
+		return{
+			cityList,
+			hotList
+		}
+	}
+}
 }
 </script>
 <style scoped>
