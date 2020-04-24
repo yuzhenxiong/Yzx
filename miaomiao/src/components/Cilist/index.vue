@@ -1,97 +1,73 @@
 <template>
 <div class="cinema_body">
 				<ul>
-					<li>
+					<li v-for="item in cinemaList" :key="item.id">
 						<div>
-							<span>大地影院(澳东世纪店)</span>
-							<span class="q"><span class="price">22.9</span> 元起</span>
+							<span>{{item.nm}}</span>
+							<span class="q"><span class="price">{{item.sellPrice}}</span> 元起</span>
 						</div>
 						<div class="address">
-							<span>金州区大连经济技术开发区澳东世纪3层</span>
-							<span>1763.5km</span>
+							<span>{{item.addr}}</span>
+							<span>{{item.distance}}</span>
 						</div>
 						<div class="card">
-                			<div>小吃</div>
-                			<div>折扣卡</div>
+                			<div v-for="(i,key) in item.tag" :key="key" v-if="i===1" :class="key|formatColor()">{{key|formatCard()}}</div>
        					</div>
 					</li>
-					<li>
-						<div>
-							<span>大地影院(澳东世纪店)</span>
-							<span class="q"><span class="price">22.9</span> 元起</span>
-						</div>
-						<div class="address">
-							<span>金州区大连经济技术开发区澳东世纪3层</span>
-							<span>1763.5km</span>
-						</div>
-						<div class="card">
-                			<div>小吃</div>
-                			<div>折扣卡</div>
-       					</div>
-					</li>
-					<li>
-						<div>
-							<span>大地影院(澳东世纪店)</span>
-							<span class="q"><span class="price">22.9</span> 元起</span>
-						</div>
-						<div class="address">
-							<span>金州区大连经济技术开发区澳东世纪3层</span>
-							<span>1763.5km</span>
-						</div>
-						<div class="card">
-                			<div>小吃</div>
-                			<div>折扣卡</div>
-       					</div>
-					</li>
-					<li>
-						<div>
-							<span>大地影院(澳东世纪店)</span>
-							<span class="q"><span class="price">22.9</span> 元起</span>
-						</div>
-						<div class="address">
-							<span>金州区大连经济技术开发区澳东世纪3层</span>
-							<span>1763.5km</span>
-						</div>
-						<div class="card">
-                			<div>小吃</div>
-                			<div>折扣卡</div>
-       					</div>
-					</li>
-					<li>
-						<div>
-							<span>大地影院(澳东世纪店)</span>
-							<span class="q"><span class="price">22.9</span> 元起</span>
-						</div>
-						<div class="address">
-							<span>金州区大连经济技术开发区澳东世纪3层</span>
-							<span>1763.5km</span>
-						</div>
-						<div class="card">
-                			<div>小吃</div>
-                			<div>折扣卡</div>
-       					</div>
-					</li>
-					<li>
-						<div>
-							<span>大地影院(澳东世纪店)</span>
-							<span class="q"><span class="price">22.9</span> 元起</span>
-						</div>
-						<div class="address">
-							<span>金州区大连经济技术开发区澳东世纪3层</span>
-							<span>1763.5km</span>
-						</div>
-						<div class="card">
-                			<div>小吃</div>
-                			<div>折扣卡</div>
-       					</div>
-					</li>
+			
+		
 				</ul>
 			</div>
 </template>
 
 <script>
 export default {
-name:"cilist"
+name:"cilist",
+data(){
+	return{
+	cinemaList:[]	
+	}
+},
+mounted(){
+	this.axios.get('/api/cinemaList?cityId=10').then((res)=>{
+		var msg = res.data.msg;
+		if(msg==='ok'){
+			var data=res.data.data;
+			console.log(data);
+			this.cinemaList = data.cinemas;
+		}
+	})
+},
+filters:{
+	formatCard(key){
+		var arr=[
+			{key:'allowRefund',val:'改签'},
+			{key:"endorse",val:'退票'},
+			{key:'sell',val:'折扣'},
+			{key:'snack',val:'小吃'}
+		]
+		for(var i =0;i<arr.length;i++){
+			if(key==arr[i].key){
+			return arr[i].val	
+			}
+		}
+		
+	},
+	formatColor(key){
+		var arr=[
+			{key:'allowRefund',val:"or"},
+			{key:"endorse",val:'or'},
+			{key:'sell',val:'bl'},
+			{key:'snack',val:'bl'}
+		]
+		for(var i =0;i<arr.length;i++){
+			if(key==arr[i].key){
+			return arr[i].val	
+			}
+		}
+		
+	}
+}
 }
 </script>
 <style scoped>
