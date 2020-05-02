@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import city from './city'
 
 Vue.use(Vuex)
 
@@ -10,6 +11,7 @@ export default new Vuex.Store({
   },
   actions: {
   },
-  modules: {
+  modules: {//引入子模块
+    city
   }
 })

@@ -41,12 +41,13 @@ methods:{
             }
         }
 },
-watch:{
+watch:{//监听器
 	message:function(val){
 		var that=this;
+		var cityId = this.$store.state.city.id;
 		this.cancelRequest();
-		this.axios.get('/api/searchList?cityId=10&kw='+val,{
-			 cancelToken: new this.axios.CancelToken(function(c) {
+		this.axios.get('/api/searchList?cityId='+cityId+'&kw='+val,{
+			 cancelToken: new this.axios.CancelToken(function(c) {//通过axios自带的CancelToken进行防抖
                     that.source = c;
 				})
 			}).then((res)=>{

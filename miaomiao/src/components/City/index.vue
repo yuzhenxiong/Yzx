@@ -1,17 +1,18 @@
 <template>
 <div class="city_body">
-				
-				<mt-index-list>
+				<Loading v-if="loading"/>
+				<mt-index-list v-else>
 					 <div class="city_hot">
                         <h2>热门城市</h2>
                         <ul class="clearfix">
-                            <li v-for="item in hotList" :key="item.id" >{{ item.nm }}</li>
+                            <li v-for="item in hotList" :key="item.id" @touchstart='handleToCity(item.nm,item.id)'>{{ item.nm }}</li>
                         </ul>
                     </div>
 			<mt-index-section v-for="item in cityList" :key="item.index" :index="item.index">
-				<mt-cell v-for="itemList in item.list" :key="itemList.id" :title="itemList.nm"></mt-cell>
+				<mt-cell v-for="itemList in item.list" :key="itemList.id" :title="itemList.nm" @touchstart.native='handleToCity(itemList.nm,itemList.id)'></mt-cell>
 			</mt-index-section>
 			</mt-index-list>
+
 			</div>
 		
 </template>
@@ -22,20 +23,33 @@ name:"City",
 data(){
 	return{
 		cityList:[],
-		hotList:[]
+		hotList:[],
+		loading:true
 	}
 },
 mounted(){
+	var cityList=window.localStorage.getItem('cityList');
+	var hotList=window.localStorage.getItem('hotList');
+	if(cityList&&hotList){
+		this.loading=false;
+		this.cityList = JSON.parse(cityList);
+		this.hotList =  JSON.parse(hotList);
+	}
+	else{
 	this.axios.get('/api/cityList').then((res)=>{
 	var msg = res.data.msg;
 	if(msg==='ok'){
-		var data = res.data.data.cities
-		var {cityList,hotList} = this.formatCityList(data)
+		this.loading=false;
+		var data = res.data.data.cities;
+		var {cityList,hotList} = this.formatCityList(data);
 		this.cityList = cityList;
 		this.hotList = hotList;
-		console.log(cityList,hotList)
+		console.log(cityList,hotList);
+		window.localStorage.setItem('cityList',JSON.stringify(cityList));//将后台拿到的城市列表数据保存在localStorage中
+		window.localStorage.setItem('hotList',JSON.stringify(hotList));
 	}
 	})
+	}
 
 },
 methods:{
@@ -82,6 +96,12 @@ methods:{
 			cityList,
 			hotList
 		}
+	},
+	handleToCity(nm,id){
+		this.$store.commit('city/CITY_INFO',{nm,id});
+		window.localStorage.setItem('nowNm',nm);//将当前城市信息保存在localStorage中
+		window.localStorage.setItem('nowId',id);
+		this.$router.push('/movie/nowplaying');
 	}
 }
 }

@@ -14,7 +14,7 @@
 				</div>
        
 			</div>
-       <Cilist/>
+       <Cinemalist/>
     </div>
     <Footer />
   </div>
@@ -23,13 +23,13 @@
 <script>
 import Head from "@/components/head";
 import Footer from "@/components/TabBar";
-import Cilist from "@/components/Cilist";
+import Cinemalist from "@/components/Cinemalist";
 export default {
     name:"Cinema",
   components: {
     Head,
     Footer,
-    Cilist
+    Cinemalist
   }
 };
 </script>
